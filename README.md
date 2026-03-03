@@ -1,25 +1,36 @@
 # E-commerce-SQL-Data-Analysis-Project
-The objective of this project is to simulate how real-world data analysts in e-commerce and retail companies use SQL behind the scenes to:
+In this project, I built and analyzed a real-world e-commerce inventory database using SQL.
 
-✅ Build and structure a messy, real-world inventory database
+I structured raw catalog data into table, performed exploratory data analysis (EDA), cleaned pricing and inventory inconsistencies, and standardized the dataset for accurate analysis.
 
-✅ Perform Exploratory Data Analysis (EDA) to understand product categories, availability patterns, and pricing inconsistencies
+Using business-driven SQL queries, I generated insights on discounts, pricing patterns, stock availability, revenue potential, and value-for-money comparisons.
 
-✅ Clean and standardize raw data (handle nulls, remove invalid entries, convert pricing units)
+This project replicates the practical workflow followed by data analysts in quick-commerce and retail companies.
+The goal is to transform raw, messy catalog data into structured, business-ready insights using SQL.
 
-✅ Write business-driven SQL queries to extract insights related to pricing, stock levels, revenue potential, and product performance
+Through this project, we:
 
-This project mirrors the actual workflow followed by analysts working in quick-commerce companies.
+✅ Build and structure a real-world inventory database
+
+✅ Perform Exploratory Data Analysis (EDA)
+
+✅ Clean and standardize raw product data
+
+✅ Generate business-driven insights using SQL queries
+
+This mirrors how analysts work behind the scenes in retail, marketplace, and quick-commerce platforms.
 
 📁 Dataset Overview
 
 The dataset was sourced from Kaggle and originally scraped from Zepto’s official product listings.
 
-It closely resembles a real-world e-commerce inventory system.
+It represents a realistic e-commerce inventory system where:
 
-Each row represents a unique SKU (Stock Keeping Unit).
+Each row corresponds to a unique SKU (Stock Keeping Unit)
 
-⚠️ Duplicate product names exist intentionally — the same product may appear multiple times in different:
+Duplicate product names intentionally exist
+
+The same product may appear in different:
 
 Package sizes
 
@@ -29,126 +40,135 @@ Discount variations
 
 Categories
 
-This reflects how real catalog data is structured in production systems.
+This reflects how real production catalog systems store data.
 
 🧾 Dataset Columns
+Column Name	Description
+sku_id	Synthetic primary key for each product
+name	Product name as displayed in the app
+category	Product category (Fruits, Snacks, Beverages, etc.)
+mrp	Maximum Retail Price (converted from paise to ₹)
+discountPercent	Discount applied on MRP
+discountedSellingPrice	Final selling price after discount (₹)
+availableQuantity	Units available in inventory
+weightInGms	Product weight in grams
+outOfStock	Boolean indicator of stock availability
+quantity	Units per package
+🏗️ 1️⃣ Database & Table Creation
 
-sku_id – Synthetic primary key for each product
-
-name – Product name as displayed on the app
-
-category – Product category (Fruits, Snacks, Beverages, etc.)
-
-mrp – Maximum Retail Price (originally stored in paise, converted to ₹)
-
-discountPercent – Discount applied on MRP
-
-discountedSellingPrice – Final selling price after discount (converted to ₹)
-
-availableQuantity – Units available in inventory
-
-weightInGms – Product weight in grams
-
-outOfStock – Boolean indicator of stock availability
-
-quantity – Units per package (may vary for loose produce vs packaged goods)
-
-🔧 Project Workflow
-1️⃣ Database & Table Creation
-
-We begin by creating a structured SQL table with appropriate data types:
+A structured PostgreSQL table was created with appropriate data types:
 
 CREATE TABLE zepto (
-  sku_id SERIAL PRIMARY KEY,
-  category VARCHAR(120),
-  name VARCHAR(150) NOT NULL,
-  mrp NUMERIC(8,2),
-  discountPercent NUMERIC(5,2),
-  availableQuantity INTEGER,
-  discountedSellingPrice NUMERIC(8,2),
-  weightInGms INTEGER,
-  outOfStock BOOLEAN,
-  quantity INTEGER
+    sku_id SERIAL PRIMARY KEY,
+    category VARCHAR(120),
+    name VARCHAR(150) NOT NULL,
+    mrp NUMERIC(8,2),
+    discountPercent NUMERIC(5,2),
+    availableQuantity INTEGER,
+    discountedSellingPrice NUMERIC(8,2),
+    weightInGms INTEGER,
+    outOfStock BOOLEAN,
+    quantity INTEGER
 );
 
-2️⃣ Data Import
+📥 2️⃣ Data Import
 
 The dataset was imported using pgAdmin’s import tool.
 
-If import via UI is unavailable, the following command can be used:
+Alternatively, the following command can be used:
 
 \copy zepto(category,name,mrp,discountPercent,availableQuantity,
 discountedSellingPrice,weightInGms,outOfStock,quantity)
 FROM 'data/zepto_v2.csv'
-WITH (FORMAT csv, HEADER true, DELIMITER ',', QUOTE '"', ENCODING 'UTF8');
+WITH (
+    FORMAT csv,
+    HEADER true,
+    DELIMITER ',',
+    QUOTE '"',
+    ENCODING 'UTF8'
+);
 
-⚠️ Import Challenge
+⚠️ Import Issue & Resolution
 
-An encoding (UTF-8) error was encountered during import.
+An encoding (UTF-8) error occurred during import.
 
 This was resolved by re-saving the CSV file in CSV UTF-8 format, ensuring compatibility with PostgreSQL.
 
 🔍 3️⃣ Exploratory Data Analysis (EDA)
 
-Initial exploration focused on understanding the structure and quality of the dataset:
+Initial exploration focused on understanding structure, quality, and data distribution.
 
-Counted total number of records
+Key steps included:
 
-Previewed sample rows
+Counting total records
 
-Checked for null values across all columns
+Previewing sample rows
 
-Identified distinct product categories
+Checking null values across all columns
 
-Compared in-stock vs out-of-stock product counts
+Identifying distinct product categories
 
-Detected duplicate product names representing multiple SKUs
+Comparing in-stock vs out-of-stock products
 
-This step helped uncover inconsistencies and prepared the dataset for cleaning.
+Detecting duplicate product names representing multiple SKUs
 
-🧹 4️⃣ Data Cleaning
+This phase helped uncover inconsistencies and prepare the dataset for cleaning.
 
-To ensure accurate analysis, the following cleaning steps were performed:
+🧹 4️⃣ Data Cleaning & Standardization
 
-Removed rows where MRP or discounted selling price was zero
+To ensure analytical accuracy:
 
-Converted pricing columns from paise to rupees for readability and consistency
+Removed rows where mrp or discountedSellingPrice was zero
 
-Verified discount calculations
+Converted pricing columns from paise to rupees
 
-Standardized numerical fields
+Verified discount percentage calculations
 
-This step ensures the data reflects realistic and usable pricing information.
+Standardized numeric fields
+
+Ensured boolean values were correctly formatted
+
+After cleaning, the dataset reflected realistic pricing and inventory information.
 
 📊 5️⃣ Business-Driven SQL Analysis
 
-After cleaning, the focus shifted to generating meaningful business insights.
+With clean data, SQL was used to extract actionable business insights.
 
 💰 Pricing & Discount Analysis
 
-Identified top 10 products offering the highest discount percentage
+Top 10 products offering the highest discount percentage
 
-Ranked top 5 categories by average discount
+Top 5 categories ranked by average discount
 
-Flagged high-MRP products that are currently out of stock
+High-MRP products currently out of stock
 
 📈 Revenue Estimation
 
-Estimated potential revenue by category
-(Selling Price × Available Quantity)
+Estimated potential revenue per category
+
+Revenue = discountedSellingPrice × availableQuantity
+
 
 Identified categories contributing the highest inventory value
 
 ⚖️ Value-for-Money Analysis
 
-Calculated price per gram to compare products fairly
+Calculated price per gram for fair product comparison
 
-Identified best value products across categories
+Identified best-value products across categories
 
 📦 Inventory & Weight Analysis
 
-Grouped products into Low, Medium, and Bulk weight segments
+Segmented products into:
+
+Low weight
+
+Medium weight
+
+Bulk weight
 
 Measured total inventory weight per category
 
-Analyzed stock distribution patterns
+Analyzed stock distribution patterns.
+
+This project demonstrates how raw, messy e-commerce data can be transformed into structured, business-ready insights using SQL. From database design and data cleaning to analytical querying, it reflects the real-world workflow of data analysts in retail and quick-commerce environments.
